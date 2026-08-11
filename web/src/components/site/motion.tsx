@@ -58,17 +58,32 @@ interface RevealProps {
   delay?: number;
   y?: number;
   once?: boolean;
+  duration?: number;
+  /**
+   * An opacity fade withholds content from paint until it completes, which
+   * pushes back Largest Contentful Paint. Above-the-fold copy therefore rises
+   * without fading — legible from the first frame, still in motion.
+   */
+  fade?: boolean;
 }
 
 /** Quiet fade-and-rise reveal on scroll. */
-export function Reveal({ children, className, delay = 0, y = 20, once = true }: RevealProps) {
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  y = 20,
+  once = true,
+  duration = 0.85,
+  fade = true,
+}: RevealProps) {
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={fade ? { opacity: 0, y } : { y }}
+      whileInView={fade ? { opacity: 1, y: 0 } : { y: 0 }}
       viewport={{ once, margin: "-10% 0px" }}
-      transition={{ duration: 0.85, ease: EASE, delay }}
+      transition={{ duration, ease: EASE, delay }}
     >
       {children}
     </motion.div>

@@ -129,12 +129,15 @@
       }
     </style>
 
+    <!-- The hero portrait. `imagesizes` must mirror the `sizes` used by both hero
+         compositions in src/lib/content.ts, or the preload fetches a candidate
+         the page then declines to use. -->
     <link
       rel="preload"
       as="image"
       type="image/avif"
-      imagesrcset="/images/marble-table-800.avif 800w, /images/marble-table.avif 1400w"
-      imagesizes="(min-width: 1024px) 620px, (min-width: 768px) 560px, 100vw"
+      imagesrcset="/images/marble-table-800.avif 800w, /images/marble-table-1000.avif 1000w, /images/marble-table.avif 1400w"
+      imagesizes="(min-width: 1024px) 620px, (min-width: 768px) 560px, 72vw"
       fetchpriority="high"
     />
 
@@ -165,16 +168,49 @@
       }
     </script>
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P4Y225SNZ9"></script>
+    <!-- Google tag (gtag.js).
+         The command queue is installed synchronously, so the initial page_view
+         and any early route change are recorded with the timing they actually
+         happened. The 166 KB library itself is the largest asset on the page and
+         nothing on screen depends on it, so it is fetched once the page has
+         painted — or immediately on the first interaction, tab switch or unload,
+         whichever comes first, so no session is ever lost. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
         dataLayer.push(arguments);
       }
+      window.gtag = gtag;
       gtag("js", new Date());
-
       gtag("config", "G-P4Y225SNZ9");
+
+      (function () {
+        var requested = false;
+        function loadGtag() {
+          if (requested) return;
+          requested = true;
+          var tag = document.createElement("script");
+          tag.async = true;
+          tag.src = "https://www.googletagmanager.com/gtag/js?id=G-P4Y225SNZ9";
+          document.head.appendChild(tag);
+        }
+        function schedule() {
+          if (typeof window.requestIdleCallback === "function") {
+            window.requestIdleCallback(loadGtag, { timeout: 2000 });
+          } else {
+            window.setTimeout(loadGtag, 800);
+          }
+        }
+        ["pointerdown", "keydown", "touchstart", "wheel"].forEach(function (evt) {
+          window.addEventListener(evt, loadGtag, { once: true, passive: true });
+        });
+        window.addEventListener("pagehide", loadGtag, { once: true });
+        document.addEventListener("visibilitychange", function () {
+          if (document.visibilityState === "hidden") loadGtag();
+        });
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+      })();
     </script>
   </head>
 

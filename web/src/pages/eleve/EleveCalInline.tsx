@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 import { EASE } from "@/components/site/motion";
@@ -13,6 +13,24 @@ const CAL_LINK = "elevebychandni/fdc";
 const CAL_NAMESPACE = "fdc";
 
 /**
+ * Cal.com's hosted booker is a full application — roughly 2 MB over ~90 requests —
+ * and needs several seconds before it is interactive. The page is ~18,000px tall
+ * and the booking suite sits at the very bottom, so mounting two viewports ahead
+ * still costs nothing on first load while giving the embed a real head start.
+ */
+const MOUNT_MARGIN = "2000px 0px";
+
+/** Sockets are opened a little earlier still — a handshake is a few hundred bytes
+    and removes ~400ms of cold DNS/TCP/TLS from the embed's critical path. */
+const WARM_MARGIN = "3600px 0px";
+
+/** The booker's own assets and the avatars it renders come from two origins. */
+const CAL_ORIGINS = ["https://app.cal.com", "https://cal.com"];
+
+/** Safety net: reveal the calendar even if the `linkReady` signal never arrives. */
+const READY_FALLBACK_MS = 10000;
+
+/**
  * The official Cal.com inline booker, configured exactly as supplied by
  * the client (namespace "fdc", month view, per-theme brand variables).
  * Lazily mounted as the booking section approaches so the closing pages
@@ -25,24 +43,47 @@ export default function EleveCalInline() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
 
-  /* Lazy mount — the embed begins loading shortly before it scrolls into view. */
+  /* Lazy mount, in two stages — sockets to Cal.com are warmed first, then the
+     embed itself mounts as the booking suite approaches. Neither fires anywhere
+     near the top of the page. */
   useEffect(() => {
     const host = hostRef.current;
     if (!host || typeof IntersectionObserver === "undefined") {
       setMounted(true);
       return;
     }
-    const observer = new IntersectionObserver(
+
+    const warm = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setMounted(true);
-          observer.disconnect();
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        warm.disconnect();
+        for (const origin of CAL_ORIGINS) {
+          if (document.head.querySelector(`link[rel="preconnect"][href="${origin}"]`)) continue;
+          const link = document.createElement("link");
+          link.rel = "preconnect";
+          link.href = origin;
+          link.crossOrigin = "";
+          document.head.appendChild(link);
         }
       },
-      { rootMargin: "700px 0px" },
+      { rootMargin: WARM_MARGIN },
     );
-    observer.observe(host);
-    return () => observer.disconnect();
+
+    const mount = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        mount.disconnect();
+        setMounted(true);
+      },
+      { rootMargin: MOUNT_MARGIN },
+    );
+
+    warm.observe(host);
+    mount.observe(host);
+    return () => {
+      warm.disconnect();
+      mount.disconnect();
+    };
   }, []);
 
   /* Client-supplied embed configuration — applied verbatim to the shared namespace.
@@ -77,7 +118,7 @@ export default function EleveCalInline() {
       });
 
     /* Never hold the calendar hidden if the ready signal is missed. */
-    const fallback = window.setTimeout(() => setReady(true), 4500);
+    const fallback = window.setTimeout(() => setReady(true), READY_FALLBACK_MS);
 
     return () => {
       cancelled = true;
@@ -93,15 +134,30 @@ export default function EleveCalInline() {
       aria-label="Book a call, scheduling calendar"
       className="relative min-h-[560px] border border-bronze/40 p-6 md:p-8"
     >
-      <motion.p
-        aria-hidden
-        initial={false}
-        animate={{ opacity: ready ? 0 : 1 }}
-        transition={{ duration: 0.5, ease: EASE }}
-        className="pointer-events-none absolute inset-0 flex items-center justify-center font-sans text-[10px] uppercase tracking-micro text-ivory/60"
-      >
-        Preparing the calendar…
-      </motion.p>
+      {/* the waiting state — the site's own bronze hairline, drawn slowly across a
+          quiet track, rather than a spinner */}
+      <AnimatePresence>
+        {ready ? null : (
+          <motion.div
+            key="preparing"
+            aria-hidden
+            initial={false}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-5"
+          >
+            <p className="font-sans text-[10px] uppercase tracking-micro text-ivory/60">Preparing the calendar…</p>
+            <span className="relative block h-px w-24 overflow-hidden bg-ivory/15">
+              <motion.span
+                className="absolute inset-y-0 left-0 w-1/3 bg-bronze"
+                initial={{ x: "-100%" }}
+                animate={{ x: "300%" }}
+                transition={{ duration: 1.9, ease: EASE, repeat: Infinity, repeatDelay: 0.15 }}
+              />
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {mounted ? (
         <motion.div
