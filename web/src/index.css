@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* élevé by Chandni — design system
+   Warm ivory paper, espresso ink, bronze accents.
+   All colors MUST be HSL for the token layer. */
+
+@layer base {
+  :root {
+    --background: 38 42% 94%;
+    --foreground: 26 30% 13%;
+
+    --card: 38 42% 94%;
+    --card-foreground: 26 30% 13%;
+
+    --popover: 40 47% 96%;
+    --popover-foreground: 26 30% 13%;
+
+    --primary: 26 30% 13%;
+    --primary-foreground: 38 42% 94%;
+
+    --secondary: 39 33% 89%;
+    --secondary-foreground: 26 30% 13%;
+
+    --muted: 39 33% 89%;
+    --muted-foreground: 27 14% 42%;
+
+    --accent: 36 30% 50%;
+    --accent-foreground: 38 42% 94%;
+
+    --destructive: 0 62% 42%;
+    --destructive-foreground: 38 42% 94%;
+
+    --border: 27 30% 13%;
+    --input: 27 14% 55%;
+    --ring: 36 30% 50%;
+
+    --radius: 0rem;
+
+    --sidebar-background: 38 42% 94%;
+    --sidebar-foreground: 26 30% 13%;
+    --sidebar-primary: 26 30% 13%;
+    --sidebar-primary-foreground: 38 42% 94%;
+    --sidebar-accent: 39 33% 89%;
+    --sidebar-accent-foreground: 26 30% 13%;
+    --sidebar-border: 27 20% 80%;
+    --sidebar-ring: 36 30% 50%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(26 30% 13% / 0.14);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ivory text-espresso font-sans font-light;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: #a6885b;
+    color: #f6f1e9;
+  }
+
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  /* Comfortable touch targets on coarse pointers */
+  @media (pointer: coarse) {
+    button,
+    a,
+    input,
+    label,
+    textarea {
+      touch-action: manipulation;
+    }
+  }
+
+  /* Elegant, quiet scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f6f1e9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbbfa9;
+    border: 3px solid #f6f1e9;
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a6885b;
+  }
+
+  :focus-visible {
+    outline: 1px solid #a6885b;
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Thin uppercase editorial label */
+  .eyebrow {
+    @apply font-sans text-[10px] font-normal uppercase tracking-micro text-cocoa md:text-[11px];
+  }
+
+  /* Fine hairline rule */
+  .hairline {
+    @apply border-t border-espresso/[0.14];
+  }
+
+  .hairline-light {
+    @apply border-t border-ivory/20;
+  }
+
+  /* Animated underline text link */
+  .link-line {
+    position: relative;
+    display: inline-block;
+  }
+  .link-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-line:hover::after,
+  .group:hover .link-line::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Underline that starts visible and retracts on hover */
+  .link-line-active::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .link-line-active:hover::after {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+@layer utilities {
+  .font-feature-display {
+    font-feature-settings: "lnum", "kern";
+  }
+
+  .grain::before {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Script accents render as an elegant italic serif (Times New Roman) */
+  .font-script {
+    font-style: italic;
+  }
+}
+
+/* Lenis smooth scrolling — vendor-recommended guards so native CSS
+   smooth-scroll never fights Lenis's per-frame scroll writes. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee {
+    animation: none !important;
+  }
+}
