@@ -130,7 +130,17 @@ export default function EleveFounder() {
             </Reveal>
 
             <Reveal delay={0.26} className="mt-9">
-              <SolidButton onClick={() => scrollToId(BOOK_ID)}>Book a Call</SolidButton>
+              <SolidButton
+                onClick={() => scrollToId(BOOK_ID)}
+                ctaTracking={{
+                  cta_name: "Book a Call",
+                  cta_location: "Founder",
+                  cta_type: "booking",
+                  destination: `#${BOOK_ID}`,
+                }}
+              >
+                Book a Call
+              </SolidButton>
             </Reveal>
           </div>
         </div>

@@ -47,7 +47,17 @@ export default function EleveOutcomes() {
         </div>
 
         <Reveal delay={0.15} className="mt-14 text-center">
-          <SolidButton onClick={() => scrollToId(BOOK_ID)}>Book a Call</SolidButton>
+          <SolidButton
+            onClick={() => scrollToId(BOOK_ID)}
+            ctaTracking={{
+              cta_name: "Book a Call",
+              cta_location: "Outcomes",
+              cta_type: "booking",
+              destination: `#${BOOK_ID}`,
+            }}
+          >
+            Book a Call
+          </SolidButton>
         </Reveal>
       </div>
     </section>

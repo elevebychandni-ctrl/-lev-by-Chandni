@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 
 import { EASE } from "@/components/site/motion";
+import { trackCtaClick } from "@/lib/analytics";
 
 /** WhatsApp chat destination — the supplied number, digits only. */
 const WHATSAPP_URL = "https://wa.me/919319432700";
@@ -26,6 +27,14 @@ export default function EleveWhatsApp() {
       target="_blank"
       rel="noreferrer"
       aria-label="Chat with Élevé on WhatsApp"
+      onClick={() =>
+        trackCtaClick({
+          cta_name: "WhatsApp",
+          cta_location: "Floating Button",
+          cta_type: "contact",
+          destination: "wa.me",
+        })
+      }
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, ease: EASE, delay: 1.4 }}

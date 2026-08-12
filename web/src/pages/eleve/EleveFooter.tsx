@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import { Reveal, scrollToId } from "@/components/site/motion";
 import { CONTACT_EMAIL, LOCATION_LINE } from "@/lib/content";
+import { externalDestination, trackCtaClick } from "@/lib/analytics";
 
 import { ELEVE_PACKAGES } from "./copy";
 import { BOOK_ID } from "./tokens";
@@ -36,6 +37,14 @@ export default function EleveFooter() {
             <div className="mt-5 space-y-3">
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
+                onClick={() =>
+                  trackCtaClick({
+                    cta_name: "Email",
+                    cta_location: "Footer",
+                    cta_type: "contact",
+                    destination: "mailto",
+                  })
+                }
                 className="link-line inline-block break-words font-sans text-[12px] font-light text-ivory/90"
               >
                 {emailUser}@
@@ -52,7 +61,15 @@ export default function EleveFooter() {
             <div className="mt-5">
               <button
                 type="button"
-                onClick={() => scrollToId(BOOK_ID)}
+                onClick={() => {
+                  trackCtaClick({
+                    cta_name: "Book a Call",
+                    cta_location: "Footer",
+                    cta_type: "booking",
+                    destination: `#${BOOK_ID}`,
+                  });
+                  scrollToId(BOOK_ID);
+                }}
                 className="whitespace-nowrap border border-ivory bg-ivory px-5 py-3 font-sans text-[10px] uppercase tracking-micro text-espresso transition-all duration-500 hover:border-bronze hover:bg-bronze hover:text-ivory sm:px-6"
               >
                 Book a Call
@@ -71,7 +88,15 @@ export default function EleveFooter() {
                 <li key={pkg.name}>
                   <button
                     type="button"
-                    onClick={() => scrollToId("services")}
+                    onClick={() => {
+                      trackCtaClick({
+                        cta_name: pkg.name,
+                        cta_location: "Footer",
+                        cta_type: "navigation",
+                        destination: "#services",
+                      });
+                      scrollToId("services");
+                    }}
                     className="link-line font-sans text-[12px] font-light text-ivory/90"
                   >
                     {pkg.name}
@@ -81,7 +106,15 @@ export default function EleveFooter() {
               <li>
                 <button
                   type="button"
-                  onClick={() => scrollToId("beyond")}
+                  onClick={() => {
+                    trackCtaClick({
+                      cta_name: "Beyond the wardrobe",
+                      cta_location: "Footer",
+                      cta_type: "navigation",
+                      destination: "#beyond",
+                    });
+                    scrollToId("beyond");
+                  }}
                   className="link-line font-sans text-[12px] font-light text-ivory/90"
                 >
                   Beyond the wardrobe
@@ -101,6 +134,14 @@ export default function EleveFooter() {
                       href={social.href}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() =>
+                        trackCtaClick({
+                          cta_name: social.label,
+                          cta_location: "Footer",
+                          cta_type: "social",
+                          destination: externalDestination(social.href),
+                        })
+                      }
                       className="link-line font-sans text-[12px] font-light text-ivory/90"
                     >
                       {social.label}
@@ -133,6 +174,14 @@ export default function EleveFooter() {
                   <Link
                     key={legal.label}
                     to={legal.href}
+                    onClick={() =>
+                      trackCtaClick({
+                        cta_name: legal.label,
+                        cta_location: "Footer",
+                        cta_type: "navigation",
+                        destination: legal.href,
+                      })
+                    }
                     className="link-line font-sans text-[10.5px] uppercase tracking-micro text-ivory/90"
                   >
                     {legal.label}

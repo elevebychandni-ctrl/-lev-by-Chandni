@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 
 import type { SitePhoto } from "@/lib/content";
 import { cn } from "@/lib/utils";
+import { trackCtaClick, type CtaTracking } from "@/lib/analytics";
 
 /** Shared easing — a long, graceful settle. */
 export const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -314,14 +315,25 @@ interface SolidButtonProps {
   className?: string;
   light?: boolean;
   type?: "button" | "submit";
+  ctaTracking?: CtaTracking;
 }
 
 /** Primary action — quiet, confident, tactile. */
-export function SolidButton({ children, onClick, className, light = false, type = "button" }: SolidButtonProps) {
+export function SolidButton({
+  children,
+  onClick,
+  className,
+  light = false,
+  type = "button",
+  ctaTracking,
+}: SolidButtonProps) {
   return (
     <motion.button
       type={type}
-      onClick={onClick}
+      onClick={() => {
+        if (ctaTracking) trackCtaClick(ctaTracking);
+        onClick?.();
+      }}
       whileTap={{ scale: 0.975 }}
       transition={{ duration: 0.25, ease: EASE }}
       className={cn(

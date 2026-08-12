@@ -167,7 +167,17 @@ export default function EleveTestimonials() {
       </div>
 
       <Reveal delay={0.1} className="mt-16 border-t border-espresso/10 pt-8">
-        <SolidButton onClick={() => scrollToId(BOOK_ID)}>Book a Call</SolidButton>
+        <SolidButton
+          onClick={() => scrollToId(BOOK_ID)}
+          ctaTracking={{
+            cta_name: "Book a Call",
+            cta_location: "Testimonials",
+            cta_type: "booking",
+            destination: `#${BOOK_ID}`,
+          }}
+        >
+          Book a Call
+        </SolidButton>
       </Reveal>
     </section>
   );

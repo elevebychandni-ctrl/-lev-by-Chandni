@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { EASE, scrollToId, stopScroll } from "@/components/site/motion";
 import { CONTACT_EMAIL, LOCATION_LINE } from "@/lib/content";
+import { trackCtaClick } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 import { BOOK_ID, ELEVE_NAV } from "./tokens";
@@ -54,13 +55,28 @@ export default function EleveHeader() {
     wasOpen.current = open;
   }, [open]);
 
-  const go = (id: string) => {
+  const go = (id: string, label: string, menu: "Header Nav" | "Mobile Menu") => {
+    trackCtaClick({
+      cta_name: label,
+      cta_location: menu,
+      cta_type: "navigation",
+      destination: `#${id}`,
+    });
     setOpen(false);
     window.setTimeout(() => scrollToId(id), open ? 450 : 0);
   };
 
   /** "Book a Call" travels to the booking suite where the calendar lives. */
-  const book = () => go(BOOK_ID);
+  const book = (menu: "Header" | "Mobile Menu") => {
+    trackCtaClick({
+      cta_name: "Book a Call",
+      cta_location: menu,
+      cta_type: "booking",
+      destination: `#${BOOK_ID}`,
+    });
+    setOpen(false);
+    window.setTimeout(() => scrollToId(BOOK_ID), open ? 450 : 0);
+  };
 
   return (
     <>
@@ -107,7 +123,7 @@ export default function EleveHeader() {
               <button
                 key={link.id}
                 type="button"
-                onClick={() => go(link.id)}
+                onClick={() => go(link.id, link.label, "Header Nav")}
                 className="link-line whitespace-nowrap font-sans text-[11px] uppercase tracking-micro text-espresso transition-colors duration-500 hover:text-bronze"
               >
                 {link.label}
@@ -117,7 +133,7 @@ export default function EleveHeader() {
 
           <button
             type="button"
-            onClick={book}
+            onClick={() => book("Header")}
             className="hidden whitespace-nowrap border border-espresso bg-espresso px-6 py-2.5 font-sans text-[11px] uppercase tracking-micro text-ivory transition-all duration-700 hover:border-bronze hover:bg-bronze lg:block"
           >
             Book a Call
@@ -177,7 +193,7 @@ export default function EleveHeader() {
                       hidden: { y: "110%" },
                       show: { y: "0%", transition: { duration: 0.9, ease: EASE } },
                     }}
-                    onClick={() => (link.id === BOOK_ID ? book() : go(link.id))}
+                    onClick={() => (link.id === BOOK_ID ? book("Mobile Menu") : go(link.id, link.label, "Mobile Menu"))}
                     className={cn(
                       "block py-4 font-display text-4xl",
                       link.id === BOOK_ID ? "italic text-bronze" : "text-espresso",
@@ -196,7 +212,18 @@ export default function EleveHeader() {
               className="mt-10 space-y-2"
             >
               <p className="eyebrow">{LOCATION_LINE}</p>
-              <a href={`mailto:${CONTACT_EMAIL}`} className="font-sans text-sm text-cocoa">
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                onClick={() =>
+                  trackCtaClick({
+                    cta_name: "Email",
+                    cta_location: "Mobile Menu",
+                    cta_type: "contact",
+                    destination: "mailto",
+                  })
+                }
+                className="font-sans text-sm text-cocoa"
+              >
                 {CONTACT_EMAIL}
               </a>
             </motion.div>

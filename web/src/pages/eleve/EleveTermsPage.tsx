@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import { EASE, Reveal } from "@/components/site/motion";
 import { CONTACT_EMAIL, LOCATION_LINE } from "@/lib/content";
+import { trackCtaClick } from "@/lib/analytics";
 
 import EleveWhatsApp from "./EleveWhatsApp";
 
@@ -141,7 +142,18 @@ export default function EleveTermsPage() {
               <p className="font-display text-[16px] italic leading-[1.7] text-espresso">
                 Should you have any questions before or during your journey with Élevé, we’re always happy to help.
                 You can reach us at{" "}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="link-line text-bronze">
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  onClick={() =>
+                    trackCtaClick({
+                      cta_name: "Email",
+                      cta_location: "Terms Page",
+                      cta_type: "contact",
+                      destination: "mailto",
+                    })
+                  }
+                  className="link-line text-bronze"
+                >
                   {CONTACT_EMAIL}
                 </a>
                 .

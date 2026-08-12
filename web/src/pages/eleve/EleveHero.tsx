@@ -5,6 +5,13 @@ import { LOCATION_LINE, PHOTOS } from "@/lib/content";
 
 import { Curtain } from "./primitives";
 
+const EXPLORE_SERVICES_CTA = {
+  cta_name: "Explore Our Services",
+  cta_location: "Hero",
+  cta_type: "navigation" as const,
+  destination: "#services",
+};
+
 /**
  * 01 — Hero.
  * From `lg` up: the approved desktop composition, untouched — ivory
@@ -78,7 +85,11 @@ export default function EleveHero() {
           </Reveal>
 
           <Reveal delay={0.34} className="mt-8 w-full max-w-[300px]">
-            <SolidButton onClick={() => scrollToId("services")} className="w-full">
+            <SolidButton
+              onClick={() => scrollToId("services")}
+              ctaTracking={EXPLORE_SERVICES_CTA}
+              className="w-full"
+            >
               Explore Our Services
             </SolidButton>
           </Reveal>
@@ -158,7 +169,11 @@ export default function EleveHero() {
             </Reveal>
 
             <Reveal delay={0.28} className="mt-10">
-              <SolidButton onClick={() => scrollToId("services")} className="w-full sm:w-auto">
+              <SolidButton
+                onClick={() => scrollToId("services")}
+                ctaTracking={EXPLORE_SERVICES_CTA}
+                className="w-full sm:w-auto"
+              >
                 Explore Our Services
               </SolidButton>
             </Reveal>

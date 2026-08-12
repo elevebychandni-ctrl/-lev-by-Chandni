@@ -99,7 +99,17 @@ export default function ElevePersonalBrand() {
 
             <Reveal delay={0.22}>
               <div className="mt-10">
-                <SolidButton onClick={() => scrollToId(BOOK_ID)}>Book a Call</SolidButton>
+                <SolidButton
+                  onClick={() => scrollToId(BOOK_ID)}
+                  ctaTracking={{
+                    cta_name: "Book a Call",
+                    cta_location: "Personal Brand",
+                    cta_type: "booking",
+                    destination: `#${BOOK_ID}`,
+                  }}
+                >
+                  Book a Call
+                </SolidButton>
               </div>
             </Reveal>
           </div>

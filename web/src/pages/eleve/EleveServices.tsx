@@ -1,4 +1,5 @@
 import { Eyebrow, Reveal, scrollToId } from "@/components/site/motion";
+import { trackCtaClick } from "@/lib/analytics";
 
 import { ELEVE_OFFER, ELEVE_PACKAGES, ELEVE_STANDALONE } from "./copy";
 import { BOOK_ID } from "./tokens";
@@ -96,7 +97,15 @@ export default function EleveServices() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => scrollToId(BOOK_ID)}
+                    onClick={() => {
+                      trackCtaClick({
+                        cta_name: "Book Call",
+                        cta_location: `Services — ${pkg.name}`,
+                        cta_type: "booking",
+                        destination: `#${BOOK_ID}`,
+                      });
+                      scrollToId(BOOK_ID);
+                    }}
                     className="border border-espresso bg-espresso px-6 py-3 font-sans text-[9.5px] uppercase tracking-[0.22em] text-ivory transition-colors duration-500 hover:!border-bronze hover:!bg-bronze hover:!text-ivory group-hover:border-ivory group-hover:bg-ivory group-hover:text-espresso"
                   >
                     {pkg.cta} →
